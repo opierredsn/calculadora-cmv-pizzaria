@@ -10,15 +10,15 @@ ENV GENERATE_SOURCEMAP=false
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies with verbose output
-RUN npm install --verbose
+# Install dependencies
+RUN npm install
 
 # Copy source code
 COPY public/ ./public/
 COPY src/ ./src/
 
-# Build the application with verbose output
-RUN npm run build --verbose
+# Build the application
+RUN npm run build
 
 # Production stage
 FROM nginx:alpine

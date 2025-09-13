@@ -1,39 +1,31 @@
-# Dockerfile para debug do erro
+# Dockerfile final para Create React App
 FROM node:18-alpine AS builder
 
-# Set working directory
 WORKDIR /app
-
-# Install basic tools for debugging
-RUN apk add --no-cache curl
 
 # Copy package files
 COPY package*.json ./
 
-# Show package.json content
-RUN echo "=== PACKAGE.JSON ===" && cat package.json
-
-# Install dependencies with verbose output
-RUN npm ci --verbose
-
-# Show installed packages
-RUN npm list --depth=0
+# Install dependencies
+RUN npm ci
 
 # Copy source code
 COPY . .
 
-# Show project structure
-RUN echo "=== PROJECT STRUCTURE ===" && find . -type f -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx" -o -name "*.json" | head -20
+# Build the application
+RUN npm run build
 
-# Check if main files exist
-RUN echo "=== CHECKING MAIN FILES ===" && \
-    ls -la public/ || echo "No public folder" && \
-    ls -la src/ || echo "No src folder" && \
-    ls -la src/index.js || ls -la src/index.jsx || ls -la src/index.ts || ls -la src/index.tsx || echo "No main index file found"
+# Production stage
+FROM nginx:alpine
 
-# Set NODE_OPTIONS for build
-ENV NODE_OPTIONS="--max-old-space-size=1024"
+# Copy built files to nginx
+COPY --from=builder /app/build /usr/share/nginx/html/
 
-# Try build with maximum verbosity
-RUN echo "=== STARTING BUILD ===" && \
-    npm run build 2>&1 | tee build.log || (echo "=== BUILD FAILED ===" && cat build.log && exit 1)
+# Copy nginx config (opcional)
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Expose port 80
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

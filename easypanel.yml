@@ -1,0 +1,22 @@
+name: calculadora-cmv-pizzaria
+description: Calculadora de CMV para Pizzaria - React App
+
+services:
+  web:
+    type: app
+    source:
+      type: git
+      url: https://github.com/SEU_USUARIO/calculadora-cmv-pizzaria.git
+      branch: main
+    build:
+      type: dockerfile
+      dockerfile: Dockerfile
+    domains:
+      - calculadora-cmv-pizzaria.easypanel.host
+    environment:
+      - NODE_ENV=production
+    resources:
+      memory: 512Mi
+      cpu: 0.5
+    ports:
+      - 80:80

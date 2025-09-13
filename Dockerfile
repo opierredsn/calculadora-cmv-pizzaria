@@ -1,30 +1,14 @@
-# Use Node.js 18 Alpine as base image
-FROM node:18-alpine
+# Use nginx to serve static files
+FROM nginx:alpine
 
-# Set working directory
-WORKDIR /app
+# Copy built files to nginx
+COPY build/ /usr/share/nginx/html/
 
-# Set environment variables
-ENV NODE_ENV=production
-ENV GENERATE_SOURCEMAP=false
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Copy package files
-COPY package*.json ./
+# Expose port 80
+EXPOSE 80
 
-# Install dependencies
-RUN npm install
-
-# Copy all source code at once
-COPY . .
-
-# Build the application
-RUN npm run build
-
-# Install serve to serve the static files
-RUN npm install -g serve
-
-# Expose port 3000
-EXPOSE 3000
-
-# Serve the built application
-CMD ["serve", "-s", "build", "-l", "3000"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

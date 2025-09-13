@@ -19,4 +19,4 @@ services:
       memory: 512Mi
       cpu: 0.5
     ports:
-      - 3000:3000
+      - 80:80
